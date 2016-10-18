@@ -1,79 +1,25 @@
-helloworld: Helloworld Example
-===============================
-Author: Pete Muir  
-Level: Beginner  
-Technologies: CDI, Servlet  
-Summary: The `helloworld` quickstart demonstrates the use of *CDI* and *Servlet 3* and is a good starting point to verify WildFly is configured correctly.  
-Target Product: WildFly  
-Source: <https://github.com/wildfly/quickstart/>  
+# Continuous Deployment of Wildfly Applications using Developer Cloud and Application Container Cloud #
 
-What is it?
------------
+Continuing my theme of articles on Continuous Deployment (see [Dropbox](https://wbrianleonard.wordpress.com/2016/08/05/continuous-delivery-of-microservices-using-dropwizard-developer-cloud-and-application-container-cloud/), [Spring Boot](https://wbrianleonard.wordpress.com/2016/10/14/continuous-deployment-of-spring-boot-applications-using-developer-cloud-and-application-container-cloud/)) we're going to look at how [Wildfly](http://wildfly.org/) applications can be configured for CD.
 
-The `helloworld` quickstart demonstrates the use of *CDI* and *Servlet 3* in Red Hat JBoss Enterprise Application Platform 7.
+As with my other examples, I'm going with the most basic Wildfly application, Hello World. This allows us to focus on the application changes that are required without getting distracted by the unrelated complexities of a larger application. Theoretically these steps should apply to any Wildfly application and maybe we will prove that in a later article.
 
+Wildfly has an excellent repository of [quickstart](https://github.com/wildfly/quickstart) applications, of which one is [helloworld](https://github.com/wildfly/quickstart/tree/10.x/helloworld). This repository is a clone of the helloworld application with the changes necessary for Continuous Deployment to the [Oracle Application Container Cloud Service](https://cloud.oracle.com/en_US/acc?tabID=1447830811338). Those changes are:
 
-System requirements
--------------------
+## 1. Generate the Uber Jar ##
+We use [Wildfly Swarm](http://wildfly-swarm.io/) to package the application into an Uber Jar. This was achieved by adding the following build plugin to the [pom.xml](https://github.com/wbleonard/accs-wildfly/blob/master/pom.xml):
 
-The application this project produces is designed to be run on Red Hat JBoss Enterprise Application Platform 7 or later. 
-
-All you need to build this project is Java 8.0 (Java SDK 1.8) or later and Maven 3.1.1 or later. See [Configure Maven for WildFly 10](https://github.com/jboss-developer/jboss-developer-shared-resources/blob/master/guides/CONFIGURE_MAVEN_JBOSS_EAP7.md#configure-maven-to-build-and-deploy-the-quickstarts) to make sure you are configured correctly for testing the quickstarts.
-
-
-Use of WILDFLY_HOME
----------------
-
-In the following instructions, replace `WILDFLY_HOME` with the actual path to your WildFly installation. The installation path is described in detail here: [Use of WILDFLY_HOME and JBOSS_HOME Variables](https://github.com/jboss-developer/jboss-developer-shared-resources/blob/master/guides/USE_OF_EAP7_HOME.md#use-of-eap_home-and-jboss_home-variables).
-
-
-Start the WildFly Server
--------------------------
-
-1. Open a command prompt and navigate to the root of the WildFly directory.
-2. The following shows the command line to start the server:
-
-        For Linux:   WILDFLY_HOME/bin/standalone.sh
-        For Windows: WILDFLY_HOME\bin\standalone.bat
-
- 
-Build and Deploy the Quickstart
--------------------------
-
-1. Make sure you have started the WildFly server as described above.
-2. Open a command prompt and navigate to the root directory of this quickstart.
-3. Type this command to build and deploy the archive:
-
-        mvn clean install wildfly:deploy
-
-4. This will deploy `target/wildfly-helloworld.war` to the running instance of the server.
-
-
-Access the application 
----------------------
-
-The application will be running at the following URL: <http://localhost:8080/wildfly-helloworld/HelloWorld>. 
-
-
-Undeploy the Archive
---------------------
-
-1. Make sure you have started the WildFly server as described above.
-2. Open a command prompt and navigate to the root directory of this quickstart.
-3. When you are finished testing, type this command to undeploy the archive:
-
-        mvn wildfly:undeploy
-
-
-Run the Quickstart in Red Hat JBoss Developer Studio or Eclipse
--------------------------------------
-You can also start the server and deploy the quickstarts or run the Arquillian tests from Eclipse using JBoss tools. For general information about how to import a quickstart, add a WildFly server, and build and deploy a quickstart, see [Use JBoss Developer Studio or Eclipse to Run the Quickstarts](https://github.com/jboss-developer/jboss-developer-shared-resources/blob/master/guides/USE_JBDS.md#use-jboss-developer-studio-or-eclipse-to-run-the-quickstarts) 
-
-
-Debug the Application
-------------------------------------
-
-If you want to debug the source code of any library in the project, run the following command to pull the source into your local repository. The IDE should then detect it.
-
-        mvn dependency:sources
-
+			<!-- Wildfly Swarm plugin to create Uber JAR -->
+			<plugin>  
+                <groupId>org.wildfly.swarm</groupId>  
+                <artifactId>wildfly-swarm-plugin</artifactId>  
+                <version>1.0.0.Final</version>  
+                <executions>  
+                    <execution>  
+                        <goals>  
+                            <goal>package</goal>  
+                        </goals>  
+                    </execution>  
+                </executions>  
+			</plugin>  		
+## 2. Package for Application Container Cloud
