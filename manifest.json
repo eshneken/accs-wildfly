@@ -2,5 +2,5 @@
         "runtime": {  
             "majorVersion": "8"  
         },  
-        "command": "java -jar -Dswarm.https.port=$PORT -Dswarm.context.path=helloworld target/wildfly-helloworld-swarm.jar"
+        "command": "java -jar -Dswarm.https.port=$PORT -Dswarm.context.path=/ target/wildfly-helloworld-swarm.jar"
     }  
